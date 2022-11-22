@@ -8,7 +8,7 @@ const securePassword = async (password) => {
     const passwordHash = await bcrypt.hash(password, 10);
     return passwordHash;
   } catch (err) {
-    console.log(err.message);
+    console.log('securePassword', err.message);
   }
 };
 
@@ -44,7 +44,7 @@ const sendVerifyMail = async (name, email, user_id) => {
       }
     });
   } catch (err) {
-    console.log(err.message);
+    console.log('sendVerifyMail', err.message);
   }
 };
 
@@ -52,7 +52,7 @@ const loadRegister = async (req, res) => {
   try {
     res.render('registration');
   } catch (err) {
-    console.log(err.message);
+    console.log('loadRegister', err.message);
   }
 };
 
@@ -89,7 +89,7 @@ const verifyMail = async (req, res) => {
     console.log(updateInfo);
     res.render('email-verified');
   } catch (err) {
-    console.log(err.message);
+    console.log('verifyMail', err.message);
   }
 };
 
@@ -98,7 +98,7 @@ const loginLoad = async (req, res) => {
   try {
     res.render('login');
   } catch (err) {
-    console.log(err.message);
+    console.log('loginLoad', err.message);
   }
 };
 
@@ -113,6 +113,7 @@ const verifyLogin = async (req, res) => {
         if (userData.is_verified === 0) {
           res.render('login', { message: 'Please verify your mail.' });
         } else {
+          // console.log('verifyLogin', userData);
           req.session.user_id = userData._id;
           res.redirect('/home');
         }
@@ -123,15 +124,16 @@ const verifyLogin = async (req, res) => {
       res.render('login', { message: 'Email or password incorrect' });
     }
   } catch (err) {
-    console.log(err.message);
+    console.log('verifyLogin', err.message);
   }
 };
 
 const loadHome = async (req, res) => {
   try {
-    res.render('home');
+    const userData = await User.findById({ _id: req.session.user_id });
+    res.render('home', { user: userData });
   } catch (err) {
-    console.log(err.message);
+    console.log('loadHome', err.message);
   }
 };
 
@@ -140,7 +142,7 @@ const userLogout = async (req, res) => {
     req.session.destroy();
     res.redirect('/');
   } catch (err) {
-    console.log(err.message);
+    console.log('userLogout', err.message);
   }
 };
 
@@ -149,7 +151,7 @@ const forgetLoad = async (req, res) => {
   try {
     res.render('forget');
   } catch (err) {
-    console.log(err.message);
+    console.log('forgetLoad', err.message);
   }
 };
 
@@ -185,7 +187,7 @@ const sendResetPasswordMail = async (name, email, token) => {
       }
     });
   } catch (err) {
-    console.log(err.message);
+    console.log('sendResetPasswordMail', err.message);
   }
 };
 
@@ -211,7 +213,7 @@ const forgetVerify = async (req, res) => {
       res.render('forget', { message: 'User email is incorrect' });
     }
   } catch (err) {
-    console.log(err.message);
+    console.log('forgetVerify', err.message);
   }
 };
 
@@ -225,7 +227,7 @@ const forgetPasswordLoad = async (req, res) => {
       res.render('404', { message: 'Token is invalid' });
     }
   } catch (err) {
-    console.log(err.message);
+    console.log('forgetPasswordLoad', err.message);
   }
 };
 
@@ -240,7 +242,7 @@ const resetPassword = async (req, res) => {
     );
     res.redirect('/');
   } catch (error) {
-    console.log(error.message);
+    console.log('resetPassword', err.message);
   }
 };
 
@@ -249,7 +251,7 @@ const verificationLoad = async (req, res) => {
   try {
     res.render('verification-form');
   } catch (error) {
-    console.log(error.message);
+    console.log('verificationLoad', err.message);
   }
 };
 
@@ -259,8 +261,6 @@ const sendVerificationLink = async (req, res) => {
     const userData = await User.findOne({ email: email });
     if (userData) {
       sendVerifyMail(userData.name, userData.email, userData._id);
-      console.log('userData', userData);
-      console.log('user_id', userData._id);
       res.render('verification-form', {
         message: 'Resent verification mail at your email id, please check.',
       });
@@ -270,7 +270,47 @@ const sendVerificationLink = async (req, res) => {
       });
     }
   } catch (error) {
-    console.log(error.message);
+    console.log('sendVerificationLink', err.message);
+  }
+};
+
+// user profile edit & update
+const editLoad = async (req, res) => {
+  try {
+    const id = req.query.id;
+    const userData = await User.findById({ _id: id });
+    if (userData) {
+      res.render('edit', { user: userData });
+    } else {
+      res.redirect('/home');
+    }
+  } catch (err) {
+    console.log('editLoad', err.message);
+  }
+};
+
+const updateProfile = async (req, res) => {
+  try {
+    if (req.file) {
+      const userData = await User.findByIdAndUpdate(
+        { _id: req.body.user_id },
+        {
+          $set: {
+            name: req.body.name,
+            email: req.body.email,
+            image: req.file.filename,
+          },
+        }
+      );
+    } else {
+      const userData = await User.findByIdAndUpdate(
+        { _id: req.body.user_id },
+        { $set: { name: req.body.name, email: req.body.email } }
+      );
+    }
+    res.redirect('/home');
+  } catch (err) {
+    console.log('updateProfile', err.message);
   }
 };
 
@@ -288,4 +328,6 @@ module.exports = {
   resetPassword,
   verificationLoad,
   sendVerificationLink,
+  editLoad,
+  updateProfile,
 };

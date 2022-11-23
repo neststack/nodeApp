@@ -1,10 +1,10 @@
-<% include('../layouts/adminHeader.ejs') %>
+<%- include('header') %>
 <h1>Dashboard</h1>
 
 <a href="/admin/new-user">Add New User</a>
 <br><br>
 
-<table width="50%">
+<table width="100%">
   <tr>
     <th>Name</th>
     <th>Email</th>
@@ -45,4 +45,4 @@
 <br>
 <a href="/admin/home">Go to Home</a>
 
-<% include('../layouts/adminFooter.ejs') %>
+<%- include('footer') %>

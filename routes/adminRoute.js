@@ -8,13 +8,12 @@ const { isLogin, isLogout } = require('../middleware/adminAuth');
 
 // middleware
 route.use(
-  session({
-    secret: process.env.SESSION_SECRET,
-    resave: true,
-    saveUninitialized: true,
-  })
+    session({
+        secret: process.env.SESSION_SECRET,
+        resave: true,
+        saveUninitialized: true,
+    })
 );
-route.use(express.static('public'));
 route.use(bodyParser.json());
 route.use(bodyParser.urlencoded({ extended: true }));
 
@@ -23,30 +22,31 @@ route.set('view engine', 'ejs');
 route.set('views', './views/admin');
 
 const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, path.join(__dirname, '../public/userImages'));
-  },
-  filename: function (req, file, cb) {
-    const name = Date.now() + '-' + file.originalname;
-    cb(null, name);
-  },
+    destination: function (req, file, cb) {
+        cb(null, path.join(__dirname, '../public/userImages'));
+    },
+    filename: function (req, file, cb) {
+        const name = Date.now() + '-' + file.originalname;
+        cb(null, name);
+    },
 });
 const upload = multer({ storage: storage });
 
 const {
-  loadLogin,
-  verifyLogin,
-  loadDashboard,
-  logout,
-  forgetLoad,
-  forgetVerify,
-  forgetPasswordLoad,
-  resetPassword,
-  adminDashboard,
-  newUserLoad,
-  addUser,
-  editUserLoad,
-  updateUsers,
+    loadLogin,
+    verifyLogin,
+    loadDashboard,
+    logout,
+    forgetLoad,
+    forgetVerify,
+    forgetPasswordLoad,
+    resetPassword,
+    adminDashboard,
+    newUserLoad,
+    addUser,
+    editUserLoad,
+    updateUsers,
+    deleteUser,
 } = require('../controllers/adminController');
 
 route.get('/', isLogout, loadLogin);
@@ -63,7 +63,7 @@ route.post('/new-user', upload.single('image'), addUser);
 route.get('/edit-user', isLogin, editUserLoad);
 route.post('/edit-user', updateUsers);
 route.get('*', (req, res) => {
-  res.redirect('/admin');
+    res.redirect('/admin');
 });
 
 module.exports = route;

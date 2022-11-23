@@ -1,17 +1,21 @@
-<% include('../layouts/adminHeader.ejs') %>
+<%- include('header') %>
+<a href="/">Go to User Dashboard</a>
 <h1>Admin Login</h1>
 
 <% if(typeof message !== 'undefined') { %>
-<p style="color: green;"><%= message %></p>
+<p style="color: green"><%= message %></p>
 <% } %>
 
 <form action="" method="post">
-  <input type="email" name="email" placeholder="Enter email" />
-  <br /><br />
-  <input type="password" name="password" placeholder="Enter password" />
-  <br /><br />
-  <input type="submit" value="Login" />
+    <input type="email" name="email" placeholder="Enter email" />
+    <br /><br />
+    <input type="password" name="password" placeholder="Enter password" />
+    <br /><br />
+    <input type="submit" value="Login" />
 </form>
 
+<br><br>
+<p>Admin email - <b>sauske.om@gmail.com</b>, password - <b>admin (initial)</b></p>
+
 <a href="/admin/forget">Forget Password</a>
-<% include('../layouts/adminFooter.ejs') %>
+<%- include('footer') %>

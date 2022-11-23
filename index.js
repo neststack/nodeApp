@@ -1,6 +1,7 @@
 const express = require('express');
 const app = express();
 const connectDB = require('./db/connect');
+const path = require('path');
 require('dotenv').config();
 // const notFound = require('./middleware/not-found');
 // const errorHandlerMiddleware = require('./middleware/error-handler');
@@ -11,6 +12,7 @@ app.use(express.json());
 // routes
 const userRoute = require('./routes/userRoute');
 const adminRoute = require('./routes/adminRoute');
+app.use(express.static(path.resolve(__dirname,'public')));
 app.use('/', userRoute);
 app.use('/admin', adminRoute);
 

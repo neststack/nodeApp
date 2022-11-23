@@ -10,13 +10,12 @@ const path = require('path');
 
 // middleware
 route.use(
-  session({
-    secret: process.env.SESSION_SECRET,
-    resave: true,
-    saveUninitialized: true,
-  })
+    session({
+        secret: process.env.SESSION_SECRET,
+        resave: true,
+        saveUninitialized: true,
+    })
 );
-route.use(express.static('public'));
 route.use(bodyParser.json());
 route.use(bodyParser.urlencoded({ extended: true }));
 
@@ -25,32 +24,32 @@ route.set('view engine', 'ejs');
 route.set('views', './views/users');
 
 const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, path.join(__dirname, '../public/userImages'));
-  },
-  filename: function (req, file, cb) {
-    const name = Date.now() + '-' + file.originalname;
-    cb(null, name);
-  },
+    destination: function (req, file, cb) {
+        cb(null, path.join(__dirname, '../public/userImages'));
+    },
+    filename: function (req, file, cb) {
+        const name = Date.now() + '-' + file.originalname;
+        cb(null, name);
+    },
 });
 const upload = multer({ storage: storage });
 
 const {
-  loadRegister,
-  addUser,
-  verifyMail,
-  loginLoad,
-  verifyLogin,
-  loadHome,
-  userLogout,
-  forgetLoad,
-  forgetVerify,
-  forgetPasswordLoad,
-  resetPassword,
-  verificationLoad,
-  sendVerificationLink,
-  editLoad,
-  updateProfile,
+    loadRegister,
+    addUser,
+    verifyMail,
+    loginLoad,
+    verifyLogin,
+    loadHome,
+    userLogout,
+    forgetLoad,
+    forgetVerify,
+    forgetPasswordLoad,
+    resetPassword,
+    verificationLoad,
+    sendVerificationLink,
+    editLoad,
+    updateProfile,
 } = require('../controllers/userController');
 
 route.get('/register', isLogout, loadRegister);

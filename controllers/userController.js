@@ -12,7 +12,7 @@ const securePassword = async (password) => {
   }
 };
 
-// send verification mail
+// send mail
 const sendVerifyMail = async (name, email, user_id) => {
   try {
     const transporter = nodemailer.createTransport({

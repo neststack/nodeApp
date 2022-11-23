@@ -26,6 +26,7 @@ const {
   logout,
   forgetLoad,
   forgetVerify,
+  forgetPasswordLoad,
 } = require('../controllers/adminController');
 
 route.get('/', isLogout, loadLogin);
@@ -34,6 +35,7 @@ route.get('/home', isLogin, loadDashboard);
 route.get('/logout', isLogin, logout);
 route.get('/forget', isLogout, forgetLoad);
 route.post('/forget', forgetVerify);
+route.get('/forget-password', forgetPasswordLoad);
 route.get('*', (req, res) => {
   res.redirect('/admin');
 });

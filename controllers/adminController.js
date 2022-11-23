@@ -1,6 +1,43 @@
 const User = require('../models/userModel');
 const bcrypt = require('bcrypt');
+const nodemailer = require('nodemailer');
 const randomstring = require('randomstring');
+
+// reset password send mail
+const sendResetPasswordMail = async (name, email, token) => {
+  try {
+    const transporter = nodemailer.createTransport({
+      host: 'smtp.gmail.com',
+      port: 587,
+      secure: false,
+      requireTLS: true,
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASSWORD,
+      },
+    });
+    const mailOptions = {
+      from: process.env.EMAIL_USER,
+      to: email,
+      subject: 'For reset password',
+      html:
+        '<p>Hi <span style="font-weight:800;">' +
+        name +
+        '</span>, please click here to <a href="http://localhost:5000/admin/forget-password?token=' +
+        token +
+        '"> Reset </a> your password.</p>',
+    };
+    transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+        console.log(error);
+      } else {
+        console.log('Email has been sent:- ', info.response);
+      }
+    });
+  } catch (err) {
+    console.log('sendResetPasswordMail', err.message);
+  }
+};
 
 const loadLogin = async (req, res) => {
   try {
@@ -68,12 +105,35 @@ const forgetVerify = async (req, res) => {
       if (userData.is_admin === 0) {
         res.render('forget', { message: 'Email is incorrect' });
       } else {
+        const randomString = randomstring.generate();
+        const updatedData = await User.updateOne(
+          { email: email },
+          { $set: { token: randomString } }
+        );
+        sendResetPasswordMail(userData.name, userData.email, randomString);
+        res.render('forget', {
+          message: 'Please check your mail to reset your password.',
+        });
       }
     } else {
       res.render('forget', { message: 'Email is incorrect' });
     }
   } catch (err) {
     console.log('forgetVerify', err.message);
+  }
+};
+
+const forgetPasswordLoad = async (req, res) => {
+  try {
+    const token = req.query.token;
+    const tokenData = User.findOne({ token: token });
+    if (tokenData) {
+      res.render('forget-password', { user_id: tokenData._id });
+    } else {
+      res.render('404', { message: 'Invalid Link' });
+    }
+  } catch (err) {
+    console.log('forgetPasswordLoad', err.message);
   }
 };
 
@@ -84,4 +144,5 @@ module.exports = {
   logout,
   forgetLoad,
   forgetVerify,
+  forgetPasswordLoad,
 };
